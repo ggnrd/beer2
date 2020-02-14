@@ -33,7 +33,7 @@
         <div class="col" id="Ordersdip">
 
           <div class="table-container">
-         
+                {{#each allOrders}}
 
             <table>
               <tr>
@@ -54,7 +54,7 @@
                 <th>More info</th>
               </tr>
 
-                {{#each allOrders}}
+         
               <tr>
                 <td>{{this.email}}</td>
                 <td>{{this.Date}}</td>

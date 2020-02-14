@@ -68,7 +68,9 @@ $(document).ready(function() {
     $("#Usersdip").toggle();
   });
   $("#Blogs").click(function() {
-    $("#Blogsdisp").toggle();
+    // $("#Blogsdisp").toggle();
+    $("#NEW_BLOG").toggle();
+    $("#Blogslist").toggle();
   });
   $("#Orders").click(function() {
     $("#Ordersdip").toggle();
@@ -76,6 +78,13 @@ $(document).ready(function() {
   $("#NEW_BLOG").click(function() {
     $("#NEW_BLOGpost").toggle();
   });
+  $("#Blogslist").click(function() {
+    $("#Blogsdisp").toggle();
+    
+  });
+
+
+
 });
 
 ///////////////////////////////////

@@ -40,9 +40,26 @@
         <li class="nav-item">
           <a class="nav-link" href="#" id="Users">Users ({{allUsers.length}})</a>
         </li>
+
+
+
+     
+
         <li class="nav-item">
-          <a class="nav-link" href="#" id="Blogs">Blogs ({{allBlogs.length}})</a>
+          <a class="nav-link" href="#" id="Blogs">Blogs ({{allBlogs.length}}) <i class="fa fa-caret-down"></i>
+
+          </a>
         </li>
+          <li class="nav-item">
+          <a class="nav-link" href="#" style="display:none" id="Blogslist">Blogs list</a>
+        </li>
+
+   <li class="nav-item">
+          <a class="nav-link disabled" style="display:none" href="#" id="NEW_BLOG">NEW BLOG (Mail)</a>
+        </li>
+
+
+
         <li class="nav-item">
           <a class="nav-link disabled" href="#" id="Orders">Orders ({{allOrders.length}})</a>
         </li>
@@ -57,7 +74,7 @@
               <h3>this is the beer temp chart </h3>
               <div id="chartdiv" style=" width: 50%, height: 500px;"></div>
             </div>
-            
+
           </div>
         </div>
       </div>
@@ -251,6 +268,37 @@
         </div>
       </div>
     </div>
+  </div>
+
+  <div id="NEW_BLOGpost" style="display:none">
+    <div style="display:block">
+      <div class="col">
+        <div class="table-container">
+
+          <form action="/sendNewBlogFORall" method="POST">
+            <label for="basic-url">title</label>
+            <div class="input-group mb-3" align="center">
+
+              <input type="text" name="title" class="form-control" id="basic-url" aria-describedby="basic-addon3"
+                style="width: 70%;aling">
+            </div>
+
+
+            <div class="input-group">
+              <div class="input-group-prepend" align="center">
+                <span class="input-group-text">HTML EMAIL TEXT</span>
+              </div>
+              <textarea class="form-control" aria-label="With textarea" name="text" style="width: 70%;"></textarea>
+            </div>
+
+
+
+            <button class="btn btn-lg" type="submit">send</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
   </div>
 
   <div id="chartdiv" style=" width: 100%, height: 500px;"></div>

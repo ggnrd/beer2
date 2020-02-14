@@ -109,8 +109,8 @@ router.get('/register', function (req, res) {
 });
 
 // Register User/ http://localhost:3000/user/register   send to DB 
-router.post('/register', function (req, res) {
-  if (req.isUnauthenticated()) {
+router.post('/register',  async function (req, res) {
+  if (req.isAuthenticated()) {
     res.redirect('./')
   }
   var name = req.body.name;
@@ -145,7 +145,7 @@ router.post('/register', function (req, res) {
       orders: false
     });
 
-    User.createUser(newUser, function (err, user) {
+    await User.createUser(newUser, function (err, user) {
       if (err) throw err;
       console.log(user);
     });
@@ -177,8 +177,10 @@ router.post('/register', function (req, res) {
 
       }
     });
-    res.redirect('/users/login');
+          res.redirect('/users/login');
+
   }
+
 });
 
 passport.use(new LocalStrategy(
