@@ -756,7 +756,7 @@ router.post('/deleteOrder', function (req, res) {
   };
   mLab.deleteDocument(options)
     .then(function (response) {
-      if (isAdmin()) {
+      if (isAdmin(req)) {
         res.redirect('/users/admin/hompage');
 
       } else {
@@ -871,7 +871,7 @@ router.post('/UpdateOrder', async function (req, res) {
     } else {
       mLab.updateDocument(options)
         .then(function (response) {
-          if (isAdmin()) {
+          if (isAdmin(req)) {
             res.redirect('/admin');
           } else {
             res.redirect('/users/UserMainPage');
