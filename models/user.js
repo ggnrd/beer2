@@ -20,7 +20,7 @@ var UserSchema = mongoose.Schema({
     type: Date
   },
   orders: {
-    type: String
+    type: Number
   } 
 });
 

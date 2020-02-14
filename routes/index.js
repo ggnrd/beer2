@@ -40,16 +40,52 @@ function UpdateUserButwontCahngeAdminUser(options) {
 
 
 
-function getDocument(options) {
+function getDocuments(options) {
   return new Promise(resolve => {
     resolve(mLab.viewDocument(options));
   })
 }
 
 
-async function msg(options) {
+async function getDocument(options) {
   try {
-    var b = await getDocument(options);
+    var b = await getDocuments(options);
+    // console.log(" wait? good from the async func  🤡" +JSON.stringify( b.data));
+    return b;
+  } catch (err) {
+    console.log('bad   from the async func ' + err);
+  }
+
+}
+function listDocuments_(options) {
+  return new Promise(resolve => {
+    resolve(mLab.listDocuments(options));
+  })
+}
+
+
+async function listDocuments(options) {
+  try {
+    var b = await listDocuments_(options);
+    // console.log(" wait? good from the async func  🤡" +JSON.stringify( b.data));
+    return b;
+  } catch (err) {
+    console.log('bad   from the async func ' + err);
+  }
+
+}
+
+
+function updateDocument_(options) {
+  return new Promise(resolve => {
+    resolve(mLab.updateDocument(options));
+  })
+}
+
+
+async function updateDocument(options) {
+  try {
+    var b = await updateDocument_(options);
     // console.log(" wait? good from the async func  🤡" +JSON.stringify( b.data));
     return b;
   } catch (err) {
@@ -60,7 +96,7 @@ async function msg(options) {
 
 
 
-function UpdateUserToORdersTrue(id) {
+ async function UpdateUserToORdersTrue(id) {
   console.log(id);
 
   var options = {
@@ -72,37 +108,45 @@ function UpdateUserToORdersTrue(id) {
       "$oid": id
 
     },
-    updateObject: {
-      orders: true
-    }
+    updateObject:{},
   };
 
-  mLab.viewDocument(options)
-    .then(function (response) {
-      response.data.orders = true;
-      var options = {
-        database: 'beer',
-        collection: 'users',
-        id: response.data._id.$oid,
-        updateObject: response.data
-      };
-      mLab.updateDocument(options)
-        .then(function (response) {
-          return true
-        })
-        .catch(function (error) {
-          console.log('error', error)
-        });
-    })
-    .catch(function (error) {
-      console.log('error', error)
-    });
+let d = await getDocument(options);
+// console.log(d);
+options.updateObject=d.data;
+var temp=parseInt(d.data.orders);
+options.updateObject.orders=++temp;
+// console.log(options);
+
+d =  await updateDocument(options);
+
+
+// mLab.viewDocument(options)
+//     .then(function (response) {
+//       response.data.orders = true;
+//       var options = {
+//         database: 'beer',
+//         collection: 'users',
+//         id: response.data._id.$oid,
+//         updateObject: response.data
+//       };
+//       mLab.updateDocument(options)
+//         .then(function (response) {
+//           return true
+//         })
+//         .catch(function (error) {
+//           console.log('error', error)
+//         });
+//     })
+//     .catch(function (error) {
+//       console.log('error', error)
+//     });
 
 }
 
 function DefultParamsObjects(params) {
   Object.entries(params._doc).forEach(([key, val]) => {
-    console.log("  _doc  ==> " + key + "   val ==>  " + val); // the name of the current key.
+    // console.log("  _doc  ==> " + key + "   val ==>  " + val); // the name of the current key.
     if (key == "ZipCode" || key == "cardCVC") {
       if (val == undefined) {
         val = 0;
@@ -234,7 +278,7 @@ router.get('/', function (req, res) {
 });
 
 ////////////////gets all info from DB!
-router.get('/users/admin/hompage', function (req, res) {
+router.get('/users/admin/hompage',  async function (req, res) {
   var backPage = '/admin';
   if (isAdmin(req) == false) {
     if (req.session.passport == undefined) {
@@ -255,14 +299,16 @@ router.get('/users/admin/hompage', function (req, res) {
     database: 'beer',
     collection: 'BEER_TEMP'
   };
-  mLab.listDocuments(options)
-    .then(function (response) {
-      //console.log('time is',response.data);
-      time = response.data;
-    })
-    .catch(function (error) {
-      console.log('error', error)
-    });
+ time=await listDocuments(options);
+
+  // mLab.listDocuments(options)
+  //   .then(function (response) {
+  //     //console.log('time is',response.data);
+  //     time = response.data;
+  //   })
+  //   .catch(function (error) {
+  //     console.log('error', error)
+  //   });
 
 
   //get all blogs to the var blogs
@@ -270,14 +316,15 @@ router.get('/users/admin/hompage', function (req, res) {
     database: 'beer', //optional 
     collection: 'blogs'
   };
+   blogs=await listDocuments(options);
 
-  mLab.listDocuments(options)
-    .then(function (response) {
-      blogs = response.data;
-    })
-    .catch(function (error) {
-      console.log('error', error)
-    });
+  // mLab.listDocuments(options)
+  //   .then(function (response) {
+  //     blogs = response.data;
+  //   })
+  //   .catch(function (error) {
+  //     console.log('error', error)
+  //   });
 
 
   //get all users to the var users
@@ -286,18 +333,30 @@ router.get('/users/admin/hompage', function (req, res) {
     database: 'beer',
     collection: 'users'
   };
-  mLab.listDocuments(options)
-    .then(function (response) {
-      users = response.data;
+   users=await listDocuments(options);
+  //  Object.keys(obj).forEach(function(key) {
 
-      Object.keys(response.data).forEach(function (password) {
-        users[password].password = response.data[password].password.substring(0, 9) + ".....";
-      });
+  //   console.log(key, obj[key]);
+  
+  // });
+  Object.keys(users.data).forEach(function (password) {
+    // console.log(password, users.data[password].password);
+    users.data[password].password=users.data[password].password.substring(0, 9) + ".....";
+    // users.data[password].password = users.data[password].password.substring(0, 9) + ".....";
+  });
 
-    })
-    .catch(function (error) {
-      console.log('error', error)
-    });
+  // mLab.listDocuments(options)
+  //   .then(function (response) {
+  //     users = response.data;
+
+  //     Object.keys(response.data).forEach(function (password) {
+  //       users[password].password = response.data[password].password.substring(0, 9) + ".....";
+  //     });
+
+  //   })
+  //   .catch(function (error) {
+  //     console.log('error', error)
+  //   });
 
 
   //get all orders to the var orders
@@ -306,19 +365,47 @@ router.get('/users/admin/hompage', function (req, res) {
     database: 'beer',
     collection: 'orders'
   };
+  orders=await listDocuments(options);
+  Object.keys(orders.data).forEach(function (cardNumber) {
 
-  mLab.listDocuments(options)
-    .then(function (response) {
-      orders = response.data
-      //  console.log('orders', orders)
-      Object.keys(response.data).forEach(function (cardNumber) {
-        orders[cardNumber].cardNumber = response.data[cardNumber].cardNumber.substring(0, 9) + ".....";
-      });
-    })
+    // console.log(cardNumber, orders.data[cardNumber].cardNumber);
+         orders.data[cardNumber].cardNumber = orders.data[cardNumber].cardNumber.substring(0, 9) + ".....";
+        });
+        var copyOrders=orders;
+  // mLab.listDocuments(options)
+  //   .then(function (response) {
+  //     orders = response.data
+  //     //  console.log('orders', orders)
+  //     Object.keys(response.data).forEach(function (cardNumber) {
+  //       orders[cardNumber].cardNumber = response.data[cardNumber].cardNumber.substring(0, 9) + ".....";
+  //     });
+  //   })
 
-    .catch(function (error) {
-      console.log('error', error)
-    });
+  //   .catch(function (error) {
+  //     console.log('error', error)
+  //   });
+//   let counter=0;
+//   let counter1=0;
+// var copyOrders=orders;
+//   for (const x in users.data) {
+//          if (users.data[x].orders) {
+//       console.log("a ",users.data[x]._id.$oid);
+//       for (const key in orders.data) {
+        
+
+//         console.log("orders.data["+key+"].userId==users.data["+x+"]._id.$oid >> ",orders.data[key].userId,users.data[x]._id.$oid);
+        
+//         if (orders.data[key].userId==users.data[x]._id.$oid) {
+//           counter++
+//           delete orders.data[key];
+//         }
+//       }
+      
+//       users.data[x].orders      
+//     }
+//   }
+  
+
 
   ////// this is how to save a cookie  for 15 min
   res.cookie('rememberme', process.env.admin_KEY_USER, {
@@ -329,7 +416,7 @@ router.get('/users/admin/hompage', function (req, res) {
 
 
   //send flash and then rediract with some data
-  // setTimeout(function () {
+ 
   if (adminby == 'cookies') {
     var success_msg = req.flash('success_msg', "admin by cookies");
     var success_msg = req.flash('success_msg');
@@ -337,19 +424,18 @@ router.get('/users/admin/hompage', function (req, res) {
     var success_msg = req.flash('success_msg', "admin by session");
     var success_msg = req.flash('success_msg');
   }
-  // // }, 1000);
 
   // rander and send it to the HTML
-  setTimeout(function () {
+
     res.render('admin_homepage', {
-      allBlogs: blogs,
-      allUsers: users,
+      allBlogs: blogs.data,
+      allUsers: users.data,
       success_msg: success_msg[0],
-      allOrders: orders,
-      time: time
+      allOrders: copyOrders.data,
+      time: time.data
     });
 
-  }, 3000);
+ 
 
   ////////////// done
 
@@ -695,7 +781,7 @@ router.post('/unsubscribeToMlab', function (req, res) {
 
 
 ////////    Order 
-router.post('/accounts', function (req, res) {
+router.post('/accounts', async function (req, res) {
   if (req.isUnauthenticated()) {
     throw err;
   }
@@ -745,7 +831,9 @@ router.post('/accounts', function (req, res) {
 
 
   sendMail(req.body.order.Email, whatTOsend);
-  return true;
+  req.flash('success_msg', 'Order was placed ');
+
+   res.redirect('/');  
 });
 
 router.post('/deleteOrder', function (req, res) {
@@ -787,50 +875,30 @@ router.get('/PreeUpdateorder', function (req, res) {
 
 });
 router.post('/UpdateOrder', async function (req, res) {
-  var email = req.body.email;
-  var liter = req.body.group2;
-  var matireal = req.body.group8;
-  var Filter = req.body.Filter;
-  var Spices = req.body.Spices;
-  var alco = req.body.group4;
-  var pakege = req.body.group1;
-  var textarea = req.body.textarea;
-  var Fname = req.body.Fname;
-  var Lname = req.body.Lname;
-  var City = req.body.City;
-  var State = req.body.State;
-  var ZipCode = req.body.ZipCode;
-  var cardNumber = req.body.cardNumber;
-  var cardExpiry = req.body.cardExpiry;
-  var couponCode = req.body.couponCode;
-  var ChangedAT = new Date();
-  ChangedAT = ChangedAT.toLocaleString();
-  var Address = req.body.Address;
-
-
+ 
   var options = {
     database: 'beer',
     collection: 'orders',
     id: orderId,
     updateObject: {
-      email: email,
-      liter: liter,
-      matireal: matireal,
-      Filter: Filter,
-      Spices: Spices,
-      alco: alco,
-      pakege: pakege,
-      textarea: textarea,
-      Fname: Fname,
-      Lname: Lname,
-      City: City,
-      State: State,
-      ZipCode: ZipCode,
-      cardNumber: cardNumber,
-      cardExpiry: cardExpiry,
-      couponCode: couponCode,
-      Date: ChangedAT,
-      Address: Address
+      email: req.body.email,
+      liter: req.body.group2,
+      matireal: req.body.group8,
+      Filter: req.body.Filter,
+      Spices:  req.body.Spices,
+      alco: req.body.group4,
+      pakege: req.body.group1,
+      textarea: req.body.textarea,
+      Fname: req.body.Fname,
+      Lname: req.body.Lname,
+      City: req.body.City,
+      State: req.body.State,
+      ZipCode: req.body.ZipCode,
+      cardNumber:  req.body.cardNumber,
+      cardExpiry: req.body.cardExpiry,
+      couponCode: req.body.couponCode,
+      Date: new Date().toLocaleString(),
+      Address:  req.body.Address
     }
   };
   var options1 = {
@@ -839,13 +907,8 @@ router.post('/UpdateOrder', async function (req, res) {
     id: req.body.orderid
   };
 
-  var oldOrder = await msg(options1);
-  let x = {
-    ...options.updateObject,
-    ...oldOrder.data
-  };
-  x.Date = new Date().toLocaleString();
-
+  var oldOrder = await getDocument(options1);
+  
   for (const key in options.updateObject) {
     if (options.updateObject[key] == undefined) {
       options.updateObject[key] = "";

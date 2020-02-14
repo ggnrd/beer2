@@ -96,6 +96,7 @@
                   <th>Frist Name</th>
                   <th>Password (hashed)</th>
                   <th>Email</th>
+                  <th>Orders / Date</th>
                   <th>Action</th>
                 </tr>
 
@@ -105,6 +106,7 @@
                   <td>{{this.name}}</td>
                   <td>{{this.password}}</td>
                   <td>{{this.email}}</td>
+                  <td>{{this.orders}}</td>
                   <td>
                     <form action="/deleteUser" method="POST">
                       <input type="hidden" name="id" value={{this._id.$oid}}>

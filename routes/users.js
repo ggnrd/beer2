@@ -19,6 +19,27 @@ var mLab = MLab({
   timeout: 10000 //optional 
 })
 
+function getDocuments(options) {
+  return new Promise(resolve => {
+    resolve(mLab.listDocuments(options));
+  })
+}
+
+
+async function msg(options) {
+  try {
+    var b = await getDocuments(options);
+    // console.log(" wait? good from the async func  🤡" +JSON.stringify( b.data));
+    return b;
+  } catch (err) {
+    console.log('bad   from the async func ' + err);
+  }
+
+}
+
+
+
+
 
 // Email  string mmail address,x new pass to the user
 function sendMail(Email, x) {
@@ -104,12 +125,16 @@ router.get('/login', function (req, res) {
 
 // Register--// http://localhost:3000/user/register
 router.get('/register', function (req, res) {
-  
+
   res.render('register');
 });
 
+// router.get('/users/UserMainPage', function (req, res) {
+
+//   res.redirect('./UserMainPage')});
+
 // Register User/ http://localhost:3000/user/register   send to DB 
-router.post('/register',  async function (req, res) {
+router.post('/register', async function (req, res) {
   if (req.isAuthenticated()) {
     res.redirect('./')
   }
@@ -142,15 +167,15 @@ router.post('/register',  async function (req, res) {
       username: username,
       password: password,
       userCreateAt: new Date(),
-      orders: false
+      orders: 0
     });
 
     await User.createUser(newUser, function (err, user) {
       if (err) throw err;
       console.log(user);
     });
-
-    let transporter = nodemailer.createTransport({
+try {
+  let transporter = nodemailer.createTransport({
       service: 'Gmail',
       auth: {
         user: process.env.email_USER, // generated  user
@@ -177,7 +202,12 @@ router.post('/register',  async function (req, res) {
 
       }
     });
-          res.redirect('/users/login');
+} catch (error) {
+  console.log(error );
+  
+}
+    
+    res.redirect('/users/login');
 
   }
 
@@ -212,13 +242,14 @@ passport.use(new LocalStrategy(
     });
   }));
 //get to uesr homepage  include order infoo    need to connect order to the user than disp the order by user
-router.get('/UserMainPage', function (req, res) {
+router.get('/UserMainPage',async function (req, res) {
   if (req.isUnauthenticated()) {
     res.redirect('./')
   }
   //get all orders to the var orders
   var orders = '',
-    user, Dateshort;
+    user, Dateshort,isOrders=true;
+
   try {
     var options = {
       database: 'beer',
@@ -233,50 +264,21 @@ router.get('/UserMainPage', function (req, res) {
 
   };
 
+  var orders = await msg(options);
+if (orders.length=0) {
+  isOrders = false;
+}
+for (let index = 0; index < orders.length; index++) {
+  Dateshort = orders[index].Date.split("GMT");
+  orders[index].Date = Dateshort[0];
+  orders[index].cardNumber = orders[index].cardNumber.substring(0, 10) + "...";
+}
 
+res.render('UserMainPage', {
+  isOrders: isOrders,
+  allOrders: orders.data,
+});
 
-
-
-
-
-  mLab.listDocuments(options)
-    .then(function (response) {
-      orders = response.data
-      // console.log('orders', orders);
-      for (let index = 0; index < orders.length; index++) {
-        Dateshort = orders[index].Date.split("GMT");
-        orders[index].Date = Dateshort[0];
-        orders[index].cardNumber = orders[index].cardNumber.substring(0, 10) + "...";
-      }
-    })
-
-    .catch(function (error) {
-      console.log('error', error)
-    });
-
-  // var options = {
-  //   database: 'beer',
-  //   collection: 'users',
-  //   findOne: false
-  // };
-  // mLab.listDocuments(options)
-  // .then(function (response) {
-  //   user = response.data
-  //   //console.log('user',user);
-
-  // })
-
-  // .catch(function (error) {
-  //   console.log('error', error)
-  // });
-  setTimeout(function () {
-    res.render('UserMainPage', {
-      allOrders: orders,
-//lasDate:orders[0].Date
-    });
-
-
-  }, 3000);
 });
 
 passport.serializeUser(function (user, done) {
@@ -316,7 +318,9 @@ router.get('/logout', function (req, res) {
   req.logout();
   res.redirect('/users/login');
 });
-
+router.get('/', function (req, res) {
+  res.redirect('/users/login');
+});
 
 router.get('/resetpass', function (req, res) {
 
