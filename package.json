@@ -1,0 +1,34 @@
+{
+  "name": "Beer",
+  "version": "1.0.0",
+  "description": "Beer",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "IDan Kitner",
+  "license": "ISC",
+  "dependencies": {
+    "angular": "^1.6.9",
+    "bcryptjs": "*",
+    "body-parser": "*",
+    "chart.js": "^2.8.0",
+    "connect-flash": "*",
+    "cookie-parser": "^1.4.1",
+    "dotenv": "^5.0.1",
+    "express": "*",
+    "express-handlebars": "*",
+    "express-messages": "*",
+    "express-session": "*",
+    "express-validator": "*",
+    "mlab-data-api": "^0.2.2",
+    "mongodb": "*",
+    "mongoose": "4.1.9",
+    "nodemailer": "^2.7.2",
+    "passport": "*",
+    "passport-http": "*",
+    "passport-local": "*",
+    "plotly": "^1.0.6"
+  }
+}
